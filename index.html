@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Shachar Aviram</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><text y=%2214%22 font-size=%2216%22>💻</text></svg>">
+    <meta name="description" content="Shachar Aviram portfolio">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+.fade {
+  transition: opacity 0.2s ease-in-out;
+}
+.fade:not(.show) {
+  transition-duration: 0.1s; /* shorter fade-out */
+}
+
+.hero-animate {
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+.hero-hidden {
+  transform: translateY(-30px);
+  opacity: 0.4;
+}
+    </style>
+  </head>
+
+<body class="bg-dark d-flex flex-column min-vh-100" data-bs-theme="dark">
+    <main class="flex-fill d-flex flex-column justify-content-center text-center hero-animate">
+        <h1 class="display-4 fw-bold">Shachar Aviram</h1>
+        <p class="lead text-muted">Computer Science Student | Fullstack Developer</p>
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <a id="btnProjects" href="#projects" class="btn btn-outline-secondary">View Projects</a>
+            <a id="btnContact" href="#contact" class="btn btn-outline-secondary">Contact Me</a>
+        </div>
+    </main>
+
+    <section id="panel" class="py-5">
+        <div class="container text-center">
+            <div id="panelBox" class="mx-auto bg-body-tertiary rounded-4 shadow-sm p-4 p-md-5 d-none border-top border-2 border-dark-subtle" style="max-width: 700px;">
+                <!-- We’ll put two inner blocks here -->
+                <div id="projectsContent" class="fade d-none">
+                    <h2 class="fw-bold mb-4 text-body-emphasis">Projects</h2>
+                    <div class="vstack gap-4">
+                        <div>
+                            <h5 class="mb-1">Portfolio Website</h5>
+                            <p class="text-body-secondary mb-3">My personal website built with Bootstrap.</p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="#" class="btn btn-sm btn-outline-secondary">Live</a>
+                                <a href="#" class="btn btn-sm btn-outline-secondary">Code</a>
+                            </div>
+                        </div>
+                    </div>    
+                </div>
+                <div id="contactContent" class="fade d-none">
+                    <h2 class="fw-bold mb-4 text-body-emphasis">Contact me</h2>
+                    <p class="text-body-secondary mb-4">
+                        I’d love to connect — feel free to reach out by email or find me online:
+                    </p>
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <a href="mailto:shahara.88@gmail.com" class="btn btn-outline-secondary btn-sm">Email</a>
+                        <a href="https://linkedin.com/in/shahar-aviram-92299a200" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">LinkedIn</a>
+                        <a href="https://github.com/ShaharAviram1" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">GitHub</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="text-center py-3 text-muted small">
+        &copy; 2025 Shachar Aviram
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const projectsBlock = document.getElementById('projectsContent');
+    const contactBlock  = document.getElementById('contactContent');
+    const btnProjects   = document.getElementById('btnProjects');
+    const btnContact    = document.getElementById('btnContact');
+    const panelBox      = document.getElementById('panelBox');
+
+    let current = null;        // 'projects' | 'contact' | null
+    let isAnimating = false;   // prevent rapid double toggles breaking transitions
+
+    function setButtons(view) {
+      const showProjects = (view === 'projects');
+      const showContact  = (view === 'contact');
+
+      // Projects button
+      btnProjects.classList.toggle('btn-primary', showProjects);
+      btnProjects.classList.toggle('btn-outline-secondary', !showProjects);
+      // Contact button
+      btnContact.classList.toggle('btn-primary', showContact);
+      btnContact.classList.toggle('btn-outline-secondary', !showContact);
+    }
+
+    function fadeIn(el) {
+      el.classList.remove('d-none');
+      // force reflow so transition will fire
+      void el.offsetWidth;
+      el.classList.add('show');
+    }
+
+    function fadeOut(el) {
+      return new Promise((resolve) => {
+        function done() {
+          el.removeEventListener('transitionend', done);
+          el.classList.add('d-none');
+          resolve();
+        }
+        el.addEventListener('transitionend', done, { once: true });
+        el.classList.remove('show');
+      });
+    }
+
+    async function showPanel(target) {
+      document.querySelector('main').classList.add('hero-hidden');
+      if (isAnimating) return;
+      isAnimating = true;
+
+      const showEl = (target === 'projects') ? projectsBlock : contactBlock;
+      const hideEl = (target === 'projects') ? contactBlock   : projectsBlock;
+
+      panelBox.classList.remove('d-none');
+
+      if (current && hideEl && !hideEl.classList.contains('d-none')) {
+        await fadeOut(hideEl);
+      }
+
+      fadeIn(showEl);
+      current = target;
+      setButtons(target);
+      isAnimating = false;
+    }
+
+    async function hidePanel() {
+      if (isAnimating) return;
+      isAnimating = true;
+
+      const visibleEl = (current === 'projects') ? projectsBlock : (current === 'contact') ? contactBlock : null;
+      if (!visibleEl) {
+        panelBox.classList.add('d-none');
+        setButtons(null);
+        document.querySelector('main').classList.remove('hero-hidden');
+        isAnimating = false;
+        return;
+      }
+
+      await fadeOut(visibleEl);
+      panelBox.classList.add('d-none');
+      current = null;
+      setButtons(null);
+      document.querySelector('main').classList.remove('hero-hidden');
+      isAnimating = false;
+    }
+
+    function onToggle(view) {
+      if (current === view) {
+        hidePanel();
+      } else {
+        showPanel(view);
+      }
+    }
+
+    btnProjects.addEventListener('click', (e) => { e.preventDefault(); onToggle('projects'); });
+    btnContact .addEventListener('click', (e) => { e.preventDefault(); onToggle('contact'); });
+  });
+</script>
+</html>
