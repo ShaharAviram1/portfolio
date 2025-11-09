@@ -35,6 +35,21 @@
         </div>
     </main>
 
+    <section id="about" class="py-5 border-top">
+      <div class="container text-center">
+        <div id="aboutPanel" class="mx-auto bg-body-tertiary rounded-4 shadow-sm p-4 p-md-5 fade" style="max-width: 700px;">
+          <h2 class="fw-bold mb-4 text-body-emphasis">About Me</h2>
+          <p class="text-body-secondary mb-3">
+            I’m <strong>Shachar Aviram</strong>, a Computer Science student with a strong interest in software engineering and web development.
+            I enjoy creating clean, responsive interfaces and building projects that solve real problems.
+          </p>
+          <p class="text-body-secondary">
+            I’m always eager to learn new technologies, collaborate on meaningful ideas, and continue improving as a developer.
+          </p>
+        </div>
+      </div>
+    </section>
+
     <section id="panel" class="py-5">
         <div class="container text-center">
             <div id="panelBox" class="mx-auto bg-body-tertiary rounded-4 shadow-sm p-4 p-md-5 d-none border-top border-2 border-dark-subtle" style="max-width: 700px;">
@@ -79,6 +94,8 @@
     const btnProjects   = document.getElementById('btnProjects');
     const btnContact    = document.getElementById('btnContact');
     const panelBox      = document.getElementById('panelBox');
+    const aboutPanel = document.getElementById('aboutPanel');
+    requestAnimationFrame(() => aboutPanel.classList.add('show'));
 
     let current = null;        // 'projects' | 'contact' | null
     let isAnimating = false;   // prevent rapid double toggles breaking transitions
@@ -119,6 +136,11 @@
       if (isAnimating) return;
       isAnimating = true;
 
+      // Fade out About panel if visible
+      if (!aboutPanel.classList.contains('d-none')) {
+        await fadeOut(aboutPanel);
+      }
+
       const showEl = (target === 'projects') ? projectsBlock : contactBlock;
       const hideEl = (target === 'projects') ? contactBlock   : projectsBlock;
 
@@ -149,6 +171,7 @@
 
       await fadeOut(visibleEl);
       panelBox.classList.add('d-none');
+      fadeIn(aboutPanel);
       current = null;
       setButtons(null);
       document.querySelector('main').classList.remove('hero-hidden');
@@ -165,6 +188,17 @@
 
     btnProjects.addEventListener('click', (e) => { e.preventDefault(); onToggle('projects'); });
     btnContact .addEventListener('click', (e) => { e.preventDefault(); onToggle('contact'); });
+
+    // Close panel on outside click (not inside the card or the toggle buttons)
+    document.addEventListener('click', (e) => {
+      if (!current) return; // nothing open
+      const t = e.target;
+      const clickInsidePanel = panelBox.contains(t);
+      const clickOnButtons = btnProjects.contains(t) || btnContact.contains(t);
+      if (!clickInsidePanel && !clickOnButtons) {
+        hidePanel();
+      }
+    });
   });
 </script>
 </html>
